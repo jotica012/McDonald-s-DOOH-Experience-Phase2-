@@ -13,12 +13,14 @@ let wWidth = screen.width;
 let mupiScreen;
 
 let imageFiles = [];
-let mobileScreen = 4;
+let mobileScreen = 2;
 let screenCel;
 let user = {name:'',
-              email: '', cel: ''}
+            email: '',
+            cel: '',
+        }
 
-
+const DNS = getDNS;
 
 function loadMobileImages() {
     imageFiles[1] = loadImage('img/gotit.jpg');
@@ -52,25 +54,36 @@ function setup() {
     });
     btn.position(170);
 
-    userInput = createInput('')
-    userInput.position(30, 270)
-    userInput.size(340, 40)
-    userInput.input(myInputEvent)
-
+   nameInput = createInput('')
+   nameInput.position(30, 270)
+   nameInput.size(340, 40)
+   nameInput.input(userNameInput)
 
    emailInput = createInput('')
    emailInput.position(30, 400)
    emailInput.size(340, 40)
-   emailInput.input(myInputEvent)
+   emailInput.input(emailInput)
 
   celInput = createInput('')
   celInput.position(30, 530)
   celInput.size(340, 40)
-  celInput.input(myInputEvent)
+  celInput.input(celInput)
 
 
 }
 
+
+function userNameInput() {
+    user['name'] = this.value();
+}
+
+function emailInput() {
+    user['email'] = this.value();
+}
+
+function celInput() {
+    user['cel'] = this.value();
+}
 
 function draw() {
     console.log(mobileScreen)
@@ -80,13 +93,13 @@ function draw() {
     switch (mobileScreen) {
         case 0: //MISION
             image(imageFiles[1], 0, 0, 430, 932);
-            userInput.style('display', 'none');
+            nameInput.style('display', 'none');
             emailInput.style('display', 'none');
             celInput.style('display', 'none');
             break;
         case 1: //CONTROLLER
             image(imageFiles[2], 0, 0, 430, 932);
-            userInput.style('display', 'none');
+            nameInput.style('display', 'none');
             emailInput.style('display', 'none');
             celInput.style('display', 'none');
             /*if (frameCount % 3600 == 0) {
@@ -95,19 +108,19 @@ function draw() {
             break;
         case 2: //FORM
             image(imageFiles[3], 0, 0, 430, 932);
-            userInput.style('display', 'block');
+            nameInput.style('display', 'block');
             emailInput.style('display', 'block');
             celInput.style('display', 'block');
             break;
         case 3: //THNAK YOU
             image(imageFiles[4], 0, 0, 430, 932);
-            userInput.style('display', 'none');
+            nameInput.style('display', 'none');
             emailInput.style('display', 'none');
             celInput.style('display', 'none');
             break;
         case 4: //MOVE
         image(imageFiles[5], 0, 0, 430, 932);
-            userInput.style('display', 'none');
+            nameInput.style('display', 'none');
             emailInput.style('display', 'none');
             celInput.style('display', 'none');
             if (frameCount % 600 == 0) {
@@ -142,14 +155,14 @@ function deviceMoved() {
             break;
     }
 }
-function myInputEvent(){
-    user.name=this.value()
+/*function myInputEvent(){
+    user.name = this.value()
     console.log(user.name)
     user.email=this.value()
     console.log(user.email)
     user.cel=this.value()
     console.log(user.cel)
-}
+}*/
 
 function mousePressed() { 
     if (mouseX > 97 && mouseX < 283 && mouseY > 605 && mouseY < 640 && mobileScreen === 0) {
@@ -168,3 +181,14 @@ socket.on('screen-cel', message =>{
    console.log(message);
    screenCel=message;
 })
+
+async function userData() {
+    const data = {
+        method: 'POST',
+        headers: {
+            "Content-Type" : "application/json"
+        },
+        body: JSON.stringify(user)
+    }
+    await fetch('/userData', data);
+}

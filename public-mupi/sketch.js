@@ -57,6 +57,9 @@ let character = {
   y: 0
 };
 
+let derecha= false
+let izquierda= false
+let presionado
 
 function mupiLoadImages() {
   mupiImages[0] = loadImage('img/0.mupi.jpg');
@@ -173,7 +176,14 @@ function draw() {
       imageMode(CORNER);
     //  image(mupiImages[9], 400, 0, 158, 163);
 
-      image(mupiImages[7],  controllerX + 350 , happyMeal.y, 200, 250)
+    //hacer el IF - ELSE IF de der e izq
+
+    if(derecha){
+      controllerX+=5
+    }  else if (izquierda) {
+      controllerX-=5
+    }
+    image(mupiImages[7],  controllerX + 350 , happyMeal.y, 200, 250)
       //console.log(controllerX);
 
       ronalds.forEach(element => {
@@ -230,17 +240,20 @@ function draw() {
     mupiScreen=5
   }*/
   
-  
-  if(screenMupi===2){
+  //Cambio de pantalla con click del joystick
+  if(mupiScreen=4
+    ===2 && presionado === '0'){
     mupiScreen=4
  }
- 
+
+ //instruccion para que en el celular pase del control al score despues de 60 segundos 
  if (timeCount >= 60 && mupiScreen === 4) {
   ScreenChange(1); 
   mupiScreen=5
 }
 console.log(screenMupi);
 
+//Cambio de pantalla cuando envio el "Send" del form 
  if(screenMupi===5){
   mupiScreen=6
 }
@@ -252,7 +265,30 @@ console.log(screenMupi);
 function ScreenChange(screenBigMupi){
   socket.emit('actual-screen-mupi', screenBigMupi)
 }
-socket.on('mupi-instructions', instructions => {
+
+socket.on('arduino', ubijoystick => {
+  let {posXMapped} = ubijoystick
+  //DERECHA
+  if( posXMapped >480 && controllerX <960) {
+    derecha = true;
+  }else {
+    derecha = false;
+  }
+  //IZQUIERDA
+  if( posXMapped <480 && controllerX >0) {
+    izquierda = true;
+  }else {
+    izquierda = false;
+  }
+
+});
+
+socket.on('arduino', press=>{
+  let {pinStart} = press
+ presionado=pinStart
+});
+
+/*socket.on('mupi-instructions', instructions => {
 
   let {interactions} = instructions;
   switch (interactions) {
@@ -268,7 +304,7 @@ socket.on('mupi-instructions', instructions => {
      //console.log(mupiWidth)
       break;
   }
-});
+});*/
 
 
 socket.on('mupi-size', deviceSize => {
