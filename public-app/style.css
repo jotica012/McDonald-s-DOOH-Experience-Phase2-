@@ -1,0 +1,30 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+/*Disabled scrolling*/
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;;
+}
+
+button {
+    bottom: 2%;
+    position: fixed;
+    width: 57px;
+    border: solid 1px;
+    border-radius: 10px;
+    border-color: antiquewhite;
+    line-height: 40px;
+    background-color: rgb(255, 255, 255);
+    color: rgb(237, 4, 0);
+  }
