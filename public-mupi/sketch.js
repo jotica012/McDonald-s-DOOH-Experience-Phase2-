@@ -1,4 +1,4 @@
-const NGROK = `https://${window.location.hostname}`;
+const NGROK = `${window.location.hostname}`;
 let socket = io(NGROK, {
   path: '/real-time'
 });
@@ -40,13 +40,15 @@ let mupiWidth, mupiHeight = 0;
 //let screen = 1
 let mupiScreen = 0
 
+
 let screenMupi
 
 let ronalds = [];
 let thiefs = [];
 let points = 0;
-let wHeight
-let wWidth
+let wHeight  = 1440 ;
+let wWidth  = 960 ;
+
 let mobileScreen;
 let timeCount = 0;
 
@@ -59,7 +61,13 @@ let character = {
 
 let derecha= false
 let izquierda= false
-let presionado
+let presionado 
+let music
+
+socket.on('arduino', press=>{
+  let {pinStart} = press
+ presionado=pinStart
+});
 
 function mupiLoadImages() {
   mupiImages[0] = loadImage('img/0.mupi.jpg');
@@ -82,13 +90,15 @@ let happyMeal = new HappyMeal();
 
 function setup() {
   createCanvas(960, 1440)
+ 
   background(0)
   frameRate(60);
-
+  mupiScreen = 0
+  mupiWidth = 960;
+  mupiHeight = 1440;
   controllerX = wWidth / 2;
   controllerY = wHeight / 2;
-  mupiWidth = wWidth;
-  mupiHeight = 1440;
+ 
   background(0);
 }
 
@@ -102,7 +112,7 @@ function substractScore(number){
 
 function validateCollisionRondald(){
   ronalds.forEach((clown,i) => {
-    if(dist(clown.x, clown.y, controllerX + 350 , happyMeal.y,) < 70){
+    if(dist(clown.x, clown.y, controllerX -50 , happyMeal.y,) < 120){
      // console.log("Score bitch");
       //ronalds.splice(i,2);
       clown.x = -500;
@@ -113,15 +123,13 @@ function validateCollisionRondald(){
 
   function validateCollisionThief(){
     thiefs.forEach((bad,i) => {
-      if(dist(bad.x, bad.y, controllerX + 350, happyMeal.y,) < 70){
+      if(dist(bad.x, bad.y, controllerX -50 , happyMeal.y,) < 120){
       //  console.log("so saddd bitch");
       //thiefs.splice(i,2);
       bad.x = -500;
         substractScore(5);
       }});
     }
-
-
 /////////
 /* TO DO: 
  function validateCollisionRondald(){}
@@ -133,26 +141,34 @@ function validateCollisionRondald(){
 ////////
 function draw() {
   background(0);
+ 
   console.log(mupiScreen);
+  //
    //newCursor(pmouseX, pmouseY);
+
   switch (mupiScreen) {
     case 0: // Pantalla inicial mupi 1
       image(mupiImages[0], 0, 0, 960, 1440);
       if (frameCount % 300 == 0) {
         mupiScreen=1
+        console.log(mupiScreen)
       }
       break;
       case 1: // Pantalla inicial mupi 2
       image(mupiImages[1], 0, 0, 960, 1440);
-      if (frameCount % 1000 == 0) {
+      if (frameCount % 300 == 0) {
         mupiScreen=2
+        console.log(mupiScreen)
       }
       break;
     case 2: // Pantalla misión
       image(mupiImages[2], 0, 0, 960, 1440);
-      /*if (frameCount % 2600 == 0) {
+    /*  if (frameCount % 300 == 0) {
         mupiScreen=4
       }*/
+      if(presionado === 0){
+        mupiScreen=4
+     }
       break;
 
     case 4: // Pantalla de Juego
@@ -179,11 +195,12 @@ function draw() {
     //hacer el IF - ELSE IF de der e izq
 
     if(derecha){
-      controllerX+=5
-    }  else if (izquierda) {
-      controllerX-=5
+      controllerX+=4.5
+    }  else if
+     (izquierda) {
+      controllerX-=4.5
     }
-    image(mupiImages[7],  controllerX + 350 , happyMeal.y, 200, 250)
+    image(mupiImages[7],  controllerX -150 , happyMeal.y, 200, 250)
       //console.log(controllerX);
 
       ronalds.forEach(element => {
@@ -206,16 +223,11 @@ function draw() {
         timeCount ++ 
         console.log(timeCount)
       }
-     
   
-      
-
       /*setTimeout ( () => {
         mupiScreen=5
         ScreenChange(1);
       }, 60000) */
-     
-
       
       break;
     case 5: // Pantalla de puntos / recollecion de datos
@@ -236,46 +248,48 @@ function draw() {
   }
 
   
-  /*if (points > 80) {
+  if (points > 80) {
     mupiScreen=5
-  }*/
+  }
   
   //Cambio de pantalla con click del joystick
-  if(mupiScreen=4
-    ===2 && presionado === '0'){
+  
+  console.log(presionado);
+
+ /* if(mupiScreen === 2 && presionado === '0'){
     mupiScreen=4
- }
+ }*/
 
  //instruccion para que en el celular pase del control al score despues de 60 segundos 
- if (timeCount >= 60 && mupiScreen === 4) {
+ /*if (timeCount >= 60 && mupiScreen === 4) {
   ScreenChange(1); 
   mupiScreen=5
-}
-console.log(screenMupi);
+}*/
+//console.log(screenMupi);
 
 //Cambio de pantalla cuando envio el "Send" del form 
- if(screenMupi===5){
+/*if(screenMupi===5){
   mupiScreen=6
 }
+console.log(screenMupi);*/
 
-
-  //console.log(screenMupi);
 }
 
-function ScreenChange(screenBigMupi){
+/*function ScreenChange(screenBigMupi){
   socket.emit('actual-screen-mupi', screenBigMupi)
-}
+}*/
 
 socket.on('arduino', ubijoystick => {
   let {posXMapped} = ubijoystick
+ 
   //DERECHA
-  if( posXMapped >480 && controllerX <960) {
+  if( posXMapped > 479 && posXMapped > 480 && controllerX <960) {
     derecha = true;
   }else {
     derecha = false;
   }
   //IZQUIERDA
-  if( posXMapped <480 && controllerX >0) {
+  if( posXMapped <479 && posXMapped < 480 && controllerX > 0) {
     izquierda = true;
   }else {
     izquierda = false;
@@ -283,10 +297,6 @@ socket.on('arduino', ubijoystick => {
 
 });
 
-socket.on('arduino', press=>{
-  let {pinStart} = press
- presionado=pinStart
-});
 
 /*socket.on('mupi-instructions', instructions => {
 
@@ -307,7 +317,7 @@ socket.on('arduino', press=>{
 });*/
 
 
-socket.on('mupi-size', deviceSize => {
+/*socket.on('mupi-size', deviceSize => {
   let {
     wWidth,
     wHeight
@@ -316,7 +326,7 @@ socket.on('mupi-size', deviceSize => {
   mupiWidth = wWidth;
   console.log(wWidth);
   deviceHeight = wHeight;
-  console.log(`User is using a smartphone size of ${deviceWidth} and ${deviceHeight}`);
+  //console.log(`User is using a smartphone size of $//{deviceWidth} and ${deviceHeight}`);
 
   
 });
@@ -324,7 +334,7 @@ socket.on('mupi-size', deviceSize => {
 socket.on('screen-mupi', message =>{
  console.log(message);
   screenMupi=message;
-})
+})*/
 
 function windowResized() {
   resizeCanvas(wWidth, wHeight);
